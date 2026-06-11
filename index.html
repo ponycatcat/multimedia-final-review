@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多媒體系統 期末複習網站</title>
+<style>
+  :root{
+    --bg:#0f1220; --card:#1a1f35; --card2:#222845; --ink:#e8ecf5; --muted:#9aa5c4;
+    --accent:#6ea8fe; --accent2:#7ee0c0; --warn:#ffb454; --bad:#ff7a8a; --good:#5fd49b;
+    --line:#2c3357;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Microsoft JhengHei","PingFang TC",sans-serif;
+    background:linear-gradient(160deg,#0f1220,#141a30);color:var(--ink);line-height:1.7}
+  header{position:sticky;top:0;z-index:50;background:rgba(15,18,32,.92);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 18px}
+  h1{font-size:1.35rem;margin:0;padding:14px 0 10px}
+  h1 small{display:block;font-size:.78rem;color:var(--muted);font-weight:400;margin-top:3px}
+  nav{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:10px}
+  nav button{background:var(--card);color:var(--muted);border:1px solid var(--line);
+    padding:8px 14px;border-radius:20px;cursor:pointer;font-size:.86rem;transition:.15s}
+  nav button:hover{color:var(--ink)}
+  nav button.active{background:var(--accent);color:#0b1020;border-color:var(--accent);font-weight:600}
+  main{max-width:1000px;margin:0 auto;padding:26px 18px 80px}
+  section{display:none;animation:fade .3s}
+  section.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h2{font-size:1.5rem;border-left:5px solid var(--accent);padding-left:12px;margin:6px 0 18px}
+  h3{font-size:1.12rem;color:var(--accent2);margin:26px 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px;margin:14px 0}
+  .grid{display:grid;gap:14px}
+  @media(min-width:640px){.grid.two{grid-template-columns:1fr 1fr}}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.9rem}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left}
+  th{background:var(--card2);color:var(--accent2)}
+  code,.mono{font-family:"Consolas","Cascadia Code",monospace;background:#0c1024;
+    padding:2px 6px;border-radius:5px;color:#ffd479;font-size:.92em}
+  .pill{display:inline-block;font-size:.72rem;padding:2px 9px;border-radius:12px;
+    margin-right:6px;font-weight:600}
+  .pill.exam{background:#243; color:var(--good)}
+  .pill.quiz{background:#412; color:var(--warn)}
+  .bad{color:var(--bad);font-weight:600}
+  .good{color:var(--good);font-weight:600}
+  .key{background:linear-gradient(90deg,#1d2748,#1a1f35);border-left:4px solid var(--warn);
+    padding:12px 16px;border-radius:8px;margin:14px 0}
+  .key b{color:var(--warn)}
+  ul{margin:8px 0;padding-left:22px}
+  li{margin:5px 0}
+  .tri{text-align:center;font-family:monospace;white-space:pre;color:var(--accent2);
+    background:#0c1024;padding:14px;border-radius:8px;overflow-x:auto;font-size:.85rem}
+  .err{background:#2a1822;border:1px solid #5a2a3a;border-radius:10px;padding:14px 18px;margin:14px 0}
+  .err h4{margin:0 0 6px;color:var(--bad)}
+  .fix{background:#15291f;border:1px solid #2c5a40;border-radius:10px;padding:14px 18px;margin:14px 0}
+  .fix h4{margin:0 0 6px;color:var(--good)}
+  /* quiz */
+  .q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0}
+  .q .qnum{color:var(--accent);font-weight:700;font-size:.8rem}
+  .opt{display:block;background:var(--card2);border:1px solid var(--line);border-radius:9px;
+    padding:10px 14px;margin:8px 0;cursor:pointer;transition:.12s}
+  .opt:hover{border-color:var(--accent)}
+  .opt.sel{border-color:var(--accent);background:#243056}
+  .opt.correct{border-color:var(--good);background:#16361f}
+  .opt.wrong{border-color:var(--bad);background:#341a22}
+  .expl{display:none;margin-top:12px;padding:12px 14px;background:#0c1024;border-radius:9px;
+    border-left:3px solid var(--accent2);font-size:.9rem}
+  .expl.show{display:block}
+  .btn{background:var(--accent);color:#0b1020;border:none;padding:10px 20px;border-radius:10px;
+    font-weight:700;cursor:pointer;font-size:.95rem}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  #score{font-size:1.1rem;font-weight:700;margin:18px 0;text-align:center}
+  .flip{perspective:1000px;cursor:pointer}
+  .flip-inner{position:relative;transition:transform .5s;transform-style:preserve-3d;min-height:120px}
+  .flip.on .flip-inner{transform:rotateX(180deg)}
+  .flip-f,.flip-b{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;
+    padding:18px;display:flex;align-items:center;justify-content:center;text-align:center}
+  .flip-f{background:var(--card2);border:1px solid var(--line);font-size:1.05rem;font-weight:600}
+  .flip-b{background:#15291f;border:1px solid #2c5a40;transform:rotateX(180deg);
+    font-size:.92rem;flex-direction:column}
+  .tag{font-size:.72rem;color:var(--muted)}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;padding:30px}
+  .toc a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>多媒體系統 · 期末複習網站
+    <small>東吳大學 資二A · 涵蓋小考錯題 + 期末 8 大重點 · 點上方分頁切換</small></h1>
+  <nav id="nav"></nav>
+</div></header>
+
+<main>
+
+<!-- ============ 總覽 ============ -->
+<section id="home" class="active">
+  <h2>📌 複習地圖</h2>
+  <div class="card">
+    <p>這個網站把你的內容分成三塊。建議順序:先看 <b>小考錯題</b> 把扣分觀念補回來,再讀 <b>期末 8 重點</b>,最後做 <b>互動測驗</b> 自我檢測。</p>
+  </div>
+  <div class="grid two">
+    <div class="card">
+      <h3 style="margin-top:4px">① 小考錯題詳解</h3>
+      <p class="tag">你真正被扣分的地方</p>
+      <ul class="toc">
+        <li><a onclick="go('quiz')">Run-Length 編碼對照表</a> — 二進位轉換陷阱</li>
+        <li><a onclick="go('quiz')">前綴碼是否正確</a> — 為什麼 D 錯</li>
+        <li><a onclick="go('quiz')">高通 / 低通濾波判斷</a></li>
+        <li><a onclick="go('quiz')">Huffman Tree 建構</a></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:4px">② 期末 8 大重點</h3>
+      <p class="tag">老師指定考題</p>
+      <ul class="toc">
+        <li><a onclick="go('exam')">亮度 / 色度差異</a> · <a onclick="go('exam')">彩色影像壓縮流程</a></li>
+        <li><a onclick="go('exam')">DCT 係數解讀</a> · <a onclick="go('exam')">卷積層</a> · <a onclick="go('exam')">池化層</a></li>
+        <li><a onclick="go('exam')">CNN 訓練 2 問題</a> · <a onclick="go('exam')">三因子兩難</a> · <a onclick="go('exam')">浮水印 LSB/DCT</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="key">💡 <b>考前 5 個最常被當陷阱的點</b>
+    <ul>
+      <li>轉 <code>YCbCr</code> 的原因 = 人眼對<b>亮度敏感、色度不敏感</b> → 色度可次取樣。</li>
+      <li>DCT:<b>左上 = DC = 平均亮度</b>;<b>右下 = 高頻 = 細節</b>;能量集中低頻 → 壓縮可行。</li>
+      <li>Pooling <b>沒有可學習參數</b>(常考是非題)。</li>
+      <li>浮水印三難:<b>強韌性 / 不可察覺性 / 容量</b> 不可兼得。</li>
+      <li>前綴碼:<b>任何碼字都不能是另一碼字的前綴</b>,否則無法唯一解碼。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 小考錯題 ============ -->
+<section id="quiz">
+  <h2>📝 小考錯題完整詳解</h2>
+  <div class="card">這份是你那張 <b>69 分</b>小考的逐題拆解。每題都先講<b>觀念</b>,再放<b>完整逐步解</b>,最後標出<b>你卷子上實際錯在哪一步</b>。Run-Length(Q1、Q4)是你失分最多的地方,放在最前面講最透。</div>
+
+  <!-- ===== 觀念總綱:Run-Length ===== -->
+  <h3>Q1 &amp; Q4 共同觀念 · 為什麼要做 Run-Length 編碼?</h3>
+  <div class="card">
+    <p>當資料是「一長串 0、偶爾才一個 1」(例如<b>二值影像/傳真</b>,或<b>量化後的 DCT 係數</b>大多是 0),直接存每個 bit 很浪費。Run-Length 的想法:<b>只記「兩個 1 之間夾了幾個 0」</b>,再把這個「run 長度」用一張對照表換成碼字。</p>
+    <div class="key">💡 <b>整題最關鍵、也是你扣分主因的觀念</b>:題目的 run 數字 <code>36 / 16 / 30 / 55</code> 是<b>每一段的「總位元數」(含結尾那個 1)</b>,不是 0 的個數。<br>
+    證據:<code>36+16+30+55 = 137</code> 剛好等於題目說的「<b>137-bit</b> stream」。<br>
+    所以每段「0 的個數」要 <b>減掉那個 1</b>:</p>
+    <table>
+      <tr><th>段</th><th>該段總長(題目給的 run)</th><th>結尾的 1</th><th class="good">真正的 0 個數 L</th></tr>
+      <tr><td>1</td><td>36</td><td>−1</td><td class="good">35</td></tr>
+      <tr><td>2</td><td>16</td><td>−1</td><td class="good">15</td></tr>
+      <tr><td>3</td><td>30</td><td>−1</td><td class="good">29</td></tr>
+      <tr><td>4</td><td>55</td><td>−1</td><td class="good">54</td></tr>
+      <tr><td colspan="3">0 的總數 = 35+15+29+54 = <b>133</b>,加上 4 個 1 = <b>137</b> ✓</td><td class="good">L = 35,15,29,54</td></tr>
+    </table>
+    <div class="err"><h4>✗ 你的錯誤(差一錯誤 off-by-one)</h4>
+      你直接把 <code>36 / 16 / 30 / 55</code> 當成 0 的個數去編碼(卷子上寫 36=15+15+6…)。少減了結尾的 1,整段編碼就跟著錯。<b>正確的 L 是 35 / 15 / 29 / 54。</b></div>
+  </div>
+
+  <!-- ===== Q1 ===== -->
+  <h3>Q1 · 第一種編碼表(m 位元 + <code>1111</code> 延續碼)</h3>
+  <div class="card">
+    <p>Q1 的碼字是 <b>m=4 → 4 位元</b>。對照表這樣讀:</p>
+    <table>
+      <tr><th>Run 樣式</th><th>0 的個數 L</th><th>碼字(4-bit)</th><th>意義</th></tr>
+      <tr><td><code>1</code></td><td>0</td><td><code>0000</code></td><td>0 個 0,直接是 1</td></tr>
+      <tr><td><code>01</code></td><td>1</td><td><code>0001</code></td><td>1 個 0 後接 1</td></tr>
+      <tr><td><code>001</code></td><td>2</td><td><code>0010</code></td><td>2 個 0 後接 1</td></tr>
+      <tr><td>⋮</td><td>⋮</td><td>⋮</td><td>碼字 = L 的二進位</td></tr>
+      <tr><td><code>00000 01</code></td><td>5</td><td><code>0101</code></td><td>5 個 0 後接 1</td></tr>
+      <tr><td><code>000000 01</code></td><td>6</td><td class="good"><code>0110</code></td><td>6 → <b>0110</b>,不是 0111!</td></tr>
+      <tr><td>14 個 0 後接 1</td><td>14</td><td><code>1110</code></td><td>= 2<sup>m</sup>−2,可終止的最大值</td></tr>
+      <tr><td>15 個 0(不接 1)</td><td>15</td><td class="good"><code>1111</code></td><td>= 2<sup>m</sup>−1 = <b>延續碼</b>:吃掉 15 個 0、不終止,後面再接</td></tr>
+    </table>
+    <div class="err"><h4>✗ 你的表格錯誤</h4>你把 L=6 的碼字填成 <code>0111</code>。但 <code>0111</code> 是十進位 <b>7</b>,L=6 的二進位是 <code>0110</code>。碼字永遠 = <b>L 的 m 位元二進位</b>,轉換時請逐位檢查。</div>
+
+    <div class="key"><b>編碼演算法(Q1 版)</b>:可終止的碼字最多只能表示 14 個 0。一段有 L 個 0 時 →
+      <b>先寫 ⌊L÷15⌋ 個 <code>1111</code></b>(每個吃 15 個 0),<b>剩下的 r = L mod 15(0~14)再寫成 4-bit 二進位</b>(這一格同時代表「結尾的那個 1」)。</div>
+
+    <h4 style="color:var(--accent2);margin:18px 0 6px">完整逐段解(用正確的 L = 35,15,29,54)</h4>
+    <table>
+      <tr><th>段</th><th>L(0 的個數)</th><th>拆解</th><th>碼字</th></tr>
+      <tr><td>1</td><td>35</td><td>15 + 15 + 5</td><td><code>1111 1111 0101</code></td></tr>
+      <tr><td>2</td><td>15</td><td>15 + 0</td><td><code>1111 0000</code></td></tr>
+      <tr><td>3</td><td>29</td><td>15 + 14</td><td><code>1111 1110</code></td></tr>
+      <tr><td>4</td><td>54</td><td>15 + 15 + 15 + 9</td><td><code>1111 1111 1111 1001</code></td></tr>
+    </table>
+    <div class="fix"><h4>✓ Q1 最終編碼(共 44 bits)</h4>
+      <code>111111110101&nbsp;&nbsp;11110000&nbsp;&nbsp;11111110&nbsp;&nbsp;1111111111111001</code><br>
+      <span class="tag">137 bits → 44 bits。每段最後一格(0101 / 0000 / 1110 / 1001)就是那段結尾的「1」。</span></div>
+  </div>
+
+  <!-- ===== Q4 ===== -->
+  <h3>Q4 · 第二種編碼表(<code>1</code> + m 位元 旗標式 / Golomb 變體)</h3>
+  <div class="card">
+    <p><b>注意:Q4 的表跟 Q1 不一樣!</b> 你卷子上兩題用同一招,所以 Q4 也扣分。Q4 的碼字是 <b>「1 + 4 位元」共 5 位元</b>:</p>
+    <table>
+      <tr><th>0 的個數 L</th><th>碼字(5-bit)</th><th>結構</th></tr>
+      <tr><td>0</td><td><code>10000</code></td><td><code>1</code> + 0000</td></tr>
+      <tr><td>1</td><td><code>10001</code></td><td><code>1</code> + 0001</td></tr>
+      <tr><td>6</td><td><code>10110</code></td><td><code>1</code> + 0110</td></tr>
+      <tr><td>15</td><td><code>11111</code></td><td><code>1</code> + 1111(可終止的最大,= 2<sup>m</sup>−1)</td></tr>
+      <tr><td>每滿 16 個 0</td><td><code>0</code></td><td>延續碼:run &gt; 15 時,每 16 個 0 先寫一個 <code>0</code></td></tr>
+    </table>
+    <div class="key"><b>編碼演算法(Q4 版,等同 Golomb,除數 = 2<sup>m</sup> = 16)</b>:一段有 L 個 0 →
+      <b>先寫 q = ⌊L÷16⌋ 個 <code>0</code></b>(unary 延續),<b>再寫一個 <code>1</code> + (L mod 16) 的 4-bit 二進位</b>當終止碼。</div>
+    <h4 style="color:var(--accent2);margin:18px 0 6px">完整逐段解</h4>
+    <table>
+      <tr><th>段</th><th>L</th><th>q=⌊L/16⌋, r=L mod 16</th><th>碼字</th></tr>
+      <tr><td>1</td><td>35</td><td>q=2, r=3</td><td><code>0 0 10011</code></td></tr>
+      <tr><td>2</td><td>15</td><td>q=0, r=15</td><td><code>11111</code></td></tr>
+      <tr><td>3</td><td>29</td><td>q=1, r=13</td><td><code>0 11101</code></td></tr>
+      <tr><td>4</td><td>54</td><td>q=3, r=6</td><td><code>0 0 0 10110</code></td></tr>
+    </table>
+    <div class="fix"><h4>✓ Q4 最終編碼(共 26 bits)</h4>
+      <code>0010011&nbsp;&nbsp;11111&nbsp;&nbsp;011101&nbsp;&nbsp;00010110</code></div>
+    <div class="key">⚠️ <b>給分提醒</b>:Q4「延續碼一個 <code>0</code> 代表幾個 0」要看老師上課定義(我用最常見的「每 16 個」)。如果老師講義寫的是別的數,把除數換掉、方法一模一樣。<b>重點是你要先認出 Q4 是 5 位元旗標式、跟 Q1 不同。</b></div>
+  </div>
+
+  <!-- ===== Q2 ===== -->
+  <h3>Q2 · 這組碼是否正確?(前綴碼 Prefix Code)</h3>
+  <div class="card">
+    <p>給定:<code>A=1</code>　<code>B=01</code>　<code>C=101</code>　<code>D=011</code>。問正確嗎?為什麼?</p>
+    <div class="key"><b>前綴碼規則(Prefix-free / 可唯一解碼)</b>:任何一個碼字都<b>不能是</b>另一個碼字的開頭。否則解碼端讀 bit 流時會分不清字元在哪裡結束。</div>
+    <h4 style="color:var(--accent2);margin:14px 0 6px">逐對檢查(這就是滿分寫法)</h4>
+    <table>
+      <tr><th>比較</th><th>是否前綴?</th><th>結果</th></tr>
+      <tr><td>A=<code>1</code> vs C=<code>101</code></td><td>C 以 <code>1</code> 開頭</td><td class="bad">A 是 C 的前綴 ✗</td></tr>
+      <tr><td>B=<code>01</code> vs D=<code>011</code></td><td>D 以 <code>01</code> 開頭</td><td class="bad">B 是 D 的前綴 ✗</td></tr>
+      <tr><td>其餘配對</td><td>—</td><td class="good">OK</td></tr>
+    </table>
+    <div class="err"><h4>✗ 答案:這組碼<b>不正確</b></h4>
+      共有<b>兩處</b>違反前綴規則:<br>
+      ① <code>A=1</code> 是 <code>C=101</code> 的前綴;② <code>B=01</code> 是 <code>D=011</code> 的前綴。<br>
+      例如收到 <code>011…</code>:可能是「B(01)+下一字以 1 開頭」也可能是「D(011)」→ 無法唯一解碼。<br>
+      <span class="tag">老師批改聚焦在 B⊂D(「電腦無法辨視 B 與 D」),但完整作答把 A⊂C 也寫出來更穩。</span></div>
+    <div class="fix"><h4>✓ 怎麼改成合法前綴碼</h4>
+      讓每個字元都落在二元樹的<b>葉節點</b>。例:<code>A=0, B=10, C=110, D=111</code> → 互不為前綴,可唯一解碼。<br>
+      <b>畫樹自我檢查</b>:沿著 0/1 往下走,只有葉子能放字元,路徑中途不能停字元。</div>
+  </div>
+
+  <!-- ===== Q3 ===== -->
+  <h3>Q3 · 哪一張是高通濾波(High-pass)結果?</h3>
+  <div class="card">
+    <p class="good">✓ 你答對了:選 <b>A</b>(這題沒扣分,但把「為什麼」講滿才拿得到解釋分)。</p>
+    <div class="grid two">
+      <div class="fix"><h4>A = 高通 High-pass</h4>
+        通過<b>高頻</b>=影像中<b>劇烈變化</b>的部分=邊緣、輪廓、細節、文字筆畫;壓掉平滑區 → 平坦處變黑,只剩<b>輪廓線條</b>。圖 A 看得到字母與圖形的邊緣 → 高通。</div>
+      <div class="err" style="border-color:#2c5a40;background:#15291f"><h4 style="color:var(--good)">B = 低通 Low-pass</h4>
+        通過<b>低頻</b>=平滑、整體亮度、緩慢漸層;壓掉高頻細節 → 影像變<b>模糊</b>。圖 B 朦朧模糊 → 低通。</div>
+    </div>
+    <div class="key">💡 <b>完整解釋句</b>:「A 是高通結果,因為高通濾波保留高頻分量(邊緣/細節),衰減低頻(平滑區),所以影像只剩物體輪廓。」<br>
+      這跟 DCT 的「右下=高頻=細節、左上=低頻=平滑」是同一個頻率域概念,可以一起記。</div>
+  </div>
+
+  <!-- ===== Q5 ===== -->
+  <h3>Q5 · 畫 Huffman Tree 並求碼字(11 個字元)</h3>
+  <div class="card">
+    <p>頻率:A:19 B:6 C:7 D:8 E:21 F:5 G:9 H:4 I:16 J:3 K:2(%,合計 100)</p>
+    <div class="key"><b>演算法</b>:① 全部當節點 → ② 每次挑<b>當前最小的兩個</b>(含先前合併出來的)合併、機率相加 → ③ 重複到剩一個根(=100%) → ④ 左 0 右 1,根走到字元即碼字。<b>機率大→碼短</b>。</div>
+
+    <h4 style="color:var(--accent2);margin:16px 0 6px">完整合併過程(每一步挑兩個最小)</h4>
+    <table>
+      <tr><th>步</th><th>挑出的兩個最小</th><th>合併成</th></tr>
+      <tr><td>1</td><td>K(2) + J(3)</td><td>(KJ)=5</td></tr>
+      <tr><td>2</td><td>H(4) + F(5)</td><td>(HF)=9</td></tr>
+      <tr><td>3</td><td>(KJ)5 + B(6)</td><td>(KJB)=11</td></tr>
+      <tr><td>4</td><td>C(7) + D(8)</td><td>(CD)=15</td></tr>
+      <tr><td>5</td><td>G(9) + (HF)9</td><td>(GHF)=18</td></tr>
+      <tr><td>6</td><td>(KJB)11 + (CD)15</td><td>(KJBCD)=26</td></tr>
+      <tr><td>7</td><td>I(16) + (GHF)18</td><td>(IGHF)=34</td></tr>
+      <tr><td>8</td><td>A(19) + E(21)</td><td>(AE)=40</td></tr>
+      <tr><td>9</td><td>(KJBCD)26 + (IGHF)34</td><td>=60</td></tr>
+      <tr><td>10</td><td>(AE)40 + (…)60</td><td>=100(根)</td></tr>
+    </table>
+
+    <h4 style="color:var(--accent2);margin:16px 0 6px">樹狀圖(0=左,1=右)</h4>
+    <div class="tri">                      (100)
+                 0 /        \ 1
+              (AE)40        (60)
+              /    \       0/      \1
+           0/    1\   (KJBCD)26   (IGHF)34
+           A19   E21   /     \     0/      \1
+          (00) (01)  0/    1\   I16      (GHF)18
+                   (KJB)11 (CD)15 (110)  0/     \1
+                   0/   \1  0/  \1      G9     (HF)9
+                (KJ)5   B6  C7   D8    (1110) 0/   \1
+               0/  \1 (1001)(1010)(1011)     H4    F5
+              K2   J3                       (11110)(11111)
+            (10000)(10001)</div>
+
+    <h4 style="color:var(--accent2);margin:16px 0 6px">最終碼表</h4>
+    <table>
+      <tr><th>字元</th><th>機率</th><th>碼字</th><th>長度</th></tr>
+      <tr><td>E</td><td>21%</td><td><code>01</code></td><td>2</td></tr>
+      <tr><td>A</td><td>19%</td><td><code>00</code></td><td>2</td></tr>
+      <tr><td>I</td><td>16%</td><td><code>110</code></td><td>3</td></tr>
+      <tr><td>G</td><td>9%</td><td><code>1110</code></td><td>4</td></tr>
+      <tr><td>D</td><td>8%</td><td><code>1011</code></td><td>4</td></tr>
+      <tr><td>C</td><td>7%</td><td><code>1010</code></td><td>4</td></tr>
+      <tr><td>B</td><td>6%</td><td><code>1001</code></td><td>4</td></tr>
+      <tr><td>F</td><td>5%</td><td><code>11111</code></td><td>5</td></tr>
+      <tr><td>H</td><td>4%</td><td><code>11110</code></td><td>5</td></tr>
+      <tr><td>J</td><td>3%</td><td><code>10001</code></td><td>5</td></tr>
+      <tr><td>K</td><td>2%</td><td><code>10000</code></td><td>5</td></tr>
+    </table>
+    <p>平均碼長 = Σ(機率×長度) = <b>3.18 bits/字元</b>(熵 ≈ 3.13,效率很高)。</p>
+
+    <div class="err"><h4>✗ 你的錯誤(這題只拿一半)</h4>
+      你建的是<b>歪斜樹</b>:把 <code>E</code> 直接放在樹根當葉子 → 給了 <code>E=0</code>(只有 1 bit)。<br>
+      <b>為什麼錯</b>:1-bit 碼字代表「E 在樹根的其中一邊,另一邊是其他全部」。但要這樣,E 的機率必須 ≥ 另一邊(≈79%)。E 只有 21%,根本不夠 → E 不可能是 1 bit。正確下 <b>E 應該是 2 bits(<code>01</code>)</b>。<br>
+      <b>根因</b>:你沒有「每一步重新挑兩個最小」,而是把字元一個一個往下掛成一條長鏈。只要嚴格照合併表做,就不會歪。</div>
+    <div class="key">💡 驗算技巧:① 機率大的字元碼一定要短(E、A 最短);② 把每個碼字長度 × 機率加總,如果比別人的樹大很多,代表你的樹不是最佳。</div>
+  </div>
+</section>
+
+<!-- ============ 期末 8 重點 ============ -->
+<section id="exam">
+  <h2>🎯 期末 8 大重點</h2>
+
+  <h3>1 · 亮度(Luminance）vs 色度(Chrominance)</h3>
+  <div class="card">
+    <table>
+      <tr><th></th><th>亮度 Y</th><th>色度 Cb, Cr</th></tr>
+      <tr><td>攜帶</td><td>明暗 / 灰階細節</td><td>顏色資訊(色差)</td></tr>
+      <tr><td>人眼</td><td class="good">非常敏感</td><td class="bad">較不敏感</td></tr>
+      <tr><td>定義</td><td>Y=0.299R+0.587G+0.114B</td><td>Cb=B−Y, Cr=R−Y(縮放)</td></tr>
+      <tr><td>壓縮</td><td>保留完整解析度</td><td>可<b>次取樣</b>(4:2:2 / 4:2:0)</td></tr>
+    </table>
+    <div class="key">💡 <b>考點</b>:為何先 RGB→YCbCr?因為人眼對亮度敏感、對色度不敏感,把色度資料丟一些幾乎看不出來,可省位元。</div>
+  </div>
+
+  <h3>2 · 彩色影像壓縮流程(JPEG)</h3>
+  <div class="card">
+    <div class="tri">RGB 影像
+  │
+① 色彩轉換  RGB → YCbCr
+  │
+② 色度次取樣(4:2:0,Cb/Cr 解析度減半)
+  │
+③ 每個通道切成 8×8 區塊
+  │
+④ 對每塊做 DCT(空間域 → 頻率域)
+  │
+⑤ 量化 Quantization(除以量化表並四捨五入)  ← 失真就在這
+  │
+⑥ Zig-zag 掃描 → 行程長度編碼 RLE
+  │
+⑦ 熵編碼 Huffman / 算術編碼(無失真)
+  │
+壓縮檔 .jpg</div>
+    <p class="tag">解壓縮 = 反向:熵解碼 → 反量化 → IDCT → 色度上取樣 → YCbCr→RGB。</p>
+    <div class="key">💡 唯一造成<b>失真(lossy)</b>的步驟是<b>⑤ 量化</b>;⑥⑦ 是無失真。</div>
+  </div>
+
+  <h3>3 · DCT 係數的解讀</h3>
+  <div class="card">
+    <p>對 8×8 區塊做 2D-DCT,得到 8×8 的係數矩陣:</p>
+    <ul>
+      <li><b>DC 係數</b>(左上角 [0,0]):整塊的<b>平均亮度</b>,數值最大、最重要。</li>
+      <li><b>AC 係數</b>(其餘):代表各種<b>空間頻率</b>。
+        <ul>
+          <li>靠<b>左上 = 低頻</b> = 平滑、緩慢變化(能量集中於此)。</li>
+          <li>靠<b>右下 = 高頻</b> = 細節、邊緣、雜訊。</li>
+        </ul>
+      </li>
+      <li><b>能量集中(energy compaction)</b>:自然影像大部分能量集中在少數低頻係數,高頻接近 0。</li>
+    </ul>
+    <div class="key">💡 這正是量化能壓縮的原因:把人眼不敏感的<b>高頻係數丟掉/歸零</b>,檔案變小而看不太出來。</div>
+  </div>
+
+  <h3>4 · 卷積層(Convolutional Layer)</h3>
+  <div class="card">
+    <ul>
+      <li>用一組可學習的小<b>濾波器 / 卷積核(kernel,如 3×3)</b>滑過影像。</li>
+      <li>每個位置算<b>內積(加權和)</b> → 產生<b>特徵圖(feature map)</b>。</li>
+      <li><b>用途</b>:偵測局部特徵 — 淺層找邊緣/角點/紋理,深層組成形狀/物件。</li>
+      <li><b>兩大特性</b>:
+        <ul>
+          <li><b>局部連接</b>:每個神經元只看小範圍(receptive field)。</li>
+          <li><b>權重共享</b>:同一核掃整張圖 → 參數大幅減少、具<b>平移不變性</b>。</li>
+        </ul>
+      </li>
+      <li><b>超參數</b>:濾波器數量(深度)、核大小、<b>stride 步幅</b>、<b>padding 補邊</b>。後接非線性<b>激活(ReLU)</b>。</li>
+    </ul>
+  </div>
+
+  <h3>5 · 池化層(Pooling Layer)</h3>
+  <div class="card">
+    <ul>
+      <li>對特徵圖<b>降取樣(down-sampling)</b>,縮小寬×高。</li>
+      <li>在小視窗(如 2×2)上取值:<b>最大池化 Max</b>(取最大,最常用)、<b>平均池化 Average</b>(取平均)。</li>
+      <li><b>好處</b>:減少參數與計算、提供<b>平移不變性</b>、抑制<b>過擬合</b>、擴大感受野。</li>
+    </ul>
+    <div class="key">💡 <b>常考是非題</b>:池化層<b>沒有可學習參數</b>(它是固定運算,不像卷積有權重)。</div>
+  </div>
+
+  <h3>6 · CNN 訓練的兩個問題</h3>
+  <div class="card">
+    <div class="grid two">
+      <div class="err"><h4>① 梯度消失 Vanishing Gradient</h4>
+        深層網路反向傳播時,梯度經過多層連乘變得<b>極小 → 接近 0</b>,前面幾層權重幾乎不更新、訓練很慢。<br>
+        <b>解法</b>:ReLU 激活、適當權重初始化(He/Xavier)、Batch Normalization、殘差(skip)連接。</div>
+      <div class="err"><h4>② 過擬合 Overfitting</h4>
+        模型把訓練資料<b>細節甚至雜訊都背下來</b>,在沒看過的資料上表現差(訓練準、驗證爛)。<br>
+        <b>解法</b>:Dropout、資料擴增、L2 正則化、Early Stopping、更多資料。</div>
+    </div>
+    <p class="tag">(課程投影片 "Two Training Issues of CNN" 明列的就是這兩個。)</p>
+  </div>
+
+  <h3>7 · 三個因子的兩難(Trade-off)</h3>
+  <div class="card">
+    <p><b>壓縮的三難</b>:壓縮率、影像品質、運算成本/速度,三者無法兼得。</p>
+    <div class="tri">      壓縮率(檔案小)
+            /\
+           /  \
+   影像品質 —— 運算速度/成本</div>
+    <p><b>數位浮水印的三難(經典題)</b>三個互相牽制的因子:</p>
+    <ul>
+      <li><b>強韌性 Robustness</b> — 能撐過壓縮/雜訊/裁切等攻擊。</li>
+      <li><b>不可察覺性 Imperceptibility</b> — 看不出來,不傷畫質。</li>
+      <li><b>容量 Capacity</b> — 可嵌入的資料量。</li>
+    </ul>
+    <div class="key">💡 提高容量或強韌性,通常會犧牲不可察覺性 → 三者需取平衡。</div>
+  </div>
+
+  <h3>8 · 浮水印:LSB vs DCT 兩種做法</h3>
+  <div class="card">
+    <table>
+      <tr><th></th><th>LSB(最低有效位元)</th><th>DCT(頻率域)</th></tr>
+      <tr><td>domain</td><td><b>空間域</b></td><td><b>頻率(轉換)域</b></td></tr>
+      <tr><td>做法</td><td>把像素值的<b>最低位元</b>換成浮水印 bit</td><td>做 DCT,改<b>中頻係數</b>嵌入,再做反 DCT</td></tr>
+      <tr><td>容量</td><td class="good">高</td><td>較低</td></tr>
+      <tr><td>強韌性</td><td class="bad">弱(壓縮/濾波就毀了)</td><td class="good">強(能撐過 JPEG 壓縮)</td></tr>
+      <tr><td>複雜度</td><td>簡單、快</td><td>較複雜、慢</td></tr>
+      <tr><td>用途</td><td>易碎浮水印、簡單隱寫</td><td>強韌/版權浮水印</td></tr>
+    </table>
+    <div class="key">💡 <b>為何 DCT 嵌「中頻」?</b> 低頻一改會被看見(傷畫質);高頻會被壓縮丟掉(不強韌)→ 中頻兼顧不可察覺與強韌。</div>
+  </div>
+</section>
+
+<!-- ============ 互動測驗 ============ -->
+<section id="test">
+  <h2>🧠 互動測驗(15 題)</h2>
+  <div class="card">作答後按下方<b>「批改 + 看詳解」</b>。每題會標出對錯並顯示說明。</div>
+  <div id="quizbox"></div>
+  <div style="text-align:center;margin-top:20px">
+    <button class="btn" onclick="grade()">批改 + 看詳解</button>
+    <button class="btn ghost" onclick="resetQuiz()">重做</button>
+  </div>
+  <div id="score"></div>
+</section>
+
+<!-- ============ 閃卡 ============ -->
+<section id="cards">
+  <h2>⚡ 快速記憶閃卡</h2>
+  <div class="card">點卡片翻面看答案。考前快速掃一遍。</div>
+  <div class="grid two" id="flipbox"></div>
+</section>
+
+</main>
+
+<footer>多媒體系統 期末複習 · 離線單檔網站 · 祝考試順利 🎓</footer>
+
+<script>
+/* ---------- 分頁 ---------- */
+const tabs=[
+  ['home','總覽'],['quiz','小考錯題'],['exam','期末8重點'],
+  ['test','互動測驗'],['cards','記憶閃卡']
+];
+const nav=document.getElementById('nav');
+tabs.forEach(([id,label])=>{
+  const b=document.createElement('button');
+  b.textContent=label;b.dataset.id=id;
+  b.onclick=()=>go(id);
+  nav.appendChild(b);
+});
+function go(id){
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('active',s.id===id));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+go('home');
+
+/* ---------- 測驗題庫 ---------- */
+const QUIZ=[
+ {q:"為什麼影像壓縮前要把 RGB 轉成 YCbCr?",
+  o:["因為 YCbCr 檔案天生比較小","因為人眼對亮度敏感、對色度不敏感,色度可次取樣省位元","因為 RGB 無法做 DCT","因為螢幕只能顯示 YCbCr"],
+  a:1,e:"關鍵:人眼對亮度(Y)敏感、對色度(Cb/Cr)不敏感,所以色度可用 4:2:0 等次取樣丟掉部分資料,幾乎看不出來。"},
+
+ {q:"RLE 對照表中,run 長度 6(m=4)的碼字應為?",
+  o:["0111","0110","1100","0011"],
+  a:1,e:"碼字 = run 長度的二進位。6 = 0110。0111 是 7(這就是你小考扣分處)。"},
+
+ {q:"RLE 中全 1 碼字 1111(m=4)代表什麼?",
+  o:["15 個 0 並終止","錯誤碼","15 個 0、不終止的『延續碼』,用來拆解長 run","結束整個串流"],
+  a:2,e:"1111 是 makeup/延續碼:表示 15 個 0 但不接終止的 1,長 run 反覆用它來拆,直到剩 ≤14。"},
+
+ {q:"題目說 137-bit、各段 run = 36,16,30,55。第 1 段真正『0 的個數』是?",
+  o:["36","35","37","16"],
+  a:1,e:"36+16+30+55=137=整串長度,代表 run 含『結尾的那個 1』。所以 0 的個數要減 1 → 35。這就是你小考的 off-by-one 扣分點。"},
+
+ {q:"Q1(4-bit 表)與 Q4(5-bit『1+4位元』表)最大差別是?",
+  o:["完全一樣,可互換","Q4 碼字多一個旗標位元、延續碼是 0,兩題不能用同一招","Q4 不能編長 run","Q1 沒有延續碼"],
+  a:1,e:"Q1 是 m 位元、延續碼 1111;Q4 是『1+m 位元』旗標式(Golomb 變體)、延續碼是 0。要先認出是哪種表再編,你兩題用同招所以 Q4 也扣分。"},
+
+ {q:"碼 A=1, B=01, C=101, D=011 為何不是合法前綴碼?",
+  o:["因為碼字長度不一","因為 B=01 是 D=011 的前綴,無法唯一解碼","因為有用到 0","因為 A 太短"],
+  a:1,e:"前綴碼規則:任何碼字都不能是另一碼字的開頭。B=01 是 D=011 的前綴 → 讀到 01… 分不清 B 或 D。"},
+
+ {q:"高通濾波(High-pass)後的影像看起來像?",
+  o:["整張變模糊","只剩邊緣/輪廓,背景偏暗","顏色變鮮豔","變成灰階"],
+  a:1,e:"高通保留高頻=邊緣/細節 → 只剩輪廓。低通才是變模糊。"},
+
+ {q:"Huffman 演算法每一步要做什麼?",
+  o:["合併機率最大的兩個節點","合併機率最小的兩個節點(含先前合併的)","隨機合併","把所有節點一次合併"],
+  a:1,e:"每次取出當前『最小的兩個』節點合併,機率相加後放回再比較,直到剩一個根。機率大→碼短。"},
+
+ {q:"JPEG 壓縮流程中,唯一造成失真的步驟是?",
+  o:["DCT","量化 Quantization","Huffman 編碼","Zig-zag 掃描"],
+  a:1,e:"量化(除以量化表並四捨五入)會丟掉高頻資訊,是 lossy 的來源。DCT/Huffman/zig-zag 本身無失真。"},
+
+ {q:"8×8 DCT 矩陣中,左上角 [0,0] 的 DC 係數代表?",
+  o:["最高頻的細節","整塊的平均亮度","邊緣強度","雜訊量"],
+  a:1,e:"DC = 整個 8×8 區塊的平均亮度,數值最大最重要;往右下走頻率越高=細節。"},
+
+ {q:"DCT 之所以利於壓縮,是因為自然影像?",
+  o:["能量集中在少數低頻係數,高頻接近 0","所有係數一樣大","只有高頻有能量","係數都是負的"],
+  a:0,e:"能量集中(energy compaction):大部分能量在低頻,高頻近 0,可安心量化丟棄。"},
+
+ {q:"卷積層的『權重共享』帶來什麼好處?",
+  o:["增加參數量","同一核掃全圖 → 參數大減且具平移不變性","讓影像變大","避免使用 ReLU"],
+  a:1,e:"同一個 kernel 在整張圖重複使用,大幅減少參數,並讓特徵偵測具平移不變性。"},
+
+ {q:"關於池化層(Pooling),下列何者正確?",
+  o:["有大量可學習權重","沒有可學習參數,是固定的降取樣運算","會放大影像","只能用於最後一層"],
+  a:1,e:"池化沒有可學習參數(常考是非題),作用是降取樣、減參數、提供平移不變性。"},
+
+ {q:"CNN『梯度消失』的成因是?",
+  o:["學習率太大","梯度經多層連乘變得極小,前層幾乎不更新","資料太多","池化太多"],
+  a:1,e:"反向傳播時梯度連乘衰減到接近 0,前面層權重得不到更新。解法:ReLU、BatchNorm、殘差連接。"},
+
+ {q:"投影片明列的 CNN 兩大訓練問題是?",
+  o:["梯度消失 與 過擬合","記憶體不足 與 過熱","太慢 與 太快","欠擬合 與 雜訊"],
+  a:0,e:"課程 'Two Training Issues of CNN':Vanishing Gradient 與 Overfitting。"},
+
+ {q:"數位浮水印的三難因子是?",
+  o:["速度、容量、顏色","強韌性、不可察覺性、容量","解析度、亮度、色度","DCT、LSB、RLE"],
+  a:1,e:"Robustness(強韌)、Imperceptibility(不可察覺)、Capacity(容量)三者不可兼得。"},
+
+ {q:"DCT 浮水印通常嵌在哪個頻段?為什麼?",
+  o:["低頻,因為最穩定","高頻,因為看不見","中頻,兼顧不可察覺與抗壓縮","DC,因為最大"],
+  a:2,e:"低頻改了會被看見;高頻會被壓縮丟掉。中頻兼顧不可察覺性與強韌性。"},
+];
+
+const qbox=document.getElementById('quizbox');
+QUIZ.forEach((item,i)=>{
+  const d=document.createElement('div');d.className='q';
+  let opts=item.o.map((t,j)=>`<label class="opt" data-q="${i}" data-o="${j}">${String.fromCharCode(65+j)}. ${t}</label>`).join('');
+  d.innerHTML=`<div class="qnum">第 ${i+1} 題</div><p>${item.q}</p>${opts}
+    <div class="expl" id="e${i}"></div>`;
+  qbox.appendChild(d);
+});
+let answers={};
+qbox.addEventListener('click',e=>{
+  const o=e.target.closest('.opt');if(!o)return;
+  const qi=o.dataset.q;
+  document.querySelectorAll(`.opt[data-q="${qi}"]`).forEach(x=>x.classList.remove('sel'));
+  o.classList.add('sel');answers[qi]=+o.dataset.o;
+});
+function grade(){
+  let correct=0;
+  QUIZ.forEach((item,i)=>{
+    const chosen=answers[i];
+    document.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>{
+      const j=+x.dataset.o;x.classList.remove('correct','wrong');
+      if(j===item.a)x.classList.add('correct');
+      else if(j===chosen)x.classList.add('wrong');
+    });
+    const ex=document.getElementById('e'+i);
+    const ok=chosen===item.a;if(ok)correct++;
+    ex.innerHTML=(ok?'<span class="good">✓ 答對 </span>':'<span class="bad">✗ 答錯 </span>')+item.e;
+    ex.classList.add('show');
+  });
+  const s=document.getElementById('score');
+  const pct=Math.round(correct/QUIZ.length*100);
+  s.innerHTML=`你的分數:<span class="${pct>=80?'good':pct>=60?'':'bad'}">${correct} / ${QUIZ.length}(${pct}分)</span>`;
+  s.scrollIntoView({behavior:'smooth'});
+}
+function resetQuiz(){
+  answers={};
+  document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel','correct','wrong'));
+  document.querySelectorAll('.expl').forEach(x=>{x.classList.remove('show');x.innerHTML='';});
+  document.getElementById('score').innerHTML='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- 閃卡 ---------- */
+const CARDS=[
+ ["YCbCr 轉換的原因?","人眼對亮度敏感、色度不敏感 → 色度可次取樣省位元"],
+ ["JPEG 唯一失真步驟?","量化 Quantization(除量化表+四捨五入)"],
+ ["DCT 左上角係數叫?","DC 係數 = 整塊平均亮度(最大最重要)"],
+ ["DCT 右下角 = ?","高頻 = 邊緣/細節/雜訊;低頻在左上"],
+ ["前綴碼規則?","任何碼字都不能是另一碼字的前綴,否則無法唯一解碼"],
+ ["run 長度 6 (m=4) 碼字?","0110(不是 0111!碼字=長度的二進位)"],
+ ["RLE 全 1 碼 1111 = ?","延續碼:15 個 0 不終止,用來拆長 run"],
+ ["Huffman 每步驟?","合併『最小的兩個』節點,直到剩一個根。機率大→碼短"],
+ ["池化層有權重嗎?","沒有!固定降取樣運算,提供平移不變性"],
+ ["卷積『權重共享』好處?","同核掃全圖 → 參數大減 + 平移不變性"],
+ ["CNN 兩大訓練問題?","梯度消失 Vanishing Gradient、過擬合 Overfitting"],
+ ["梯度消失解法?","ReLU、BatchNorm、殘差連接、好的初始化"],
+ ["過擬合解法?","Dropout、資料擴增、L2、Early Stopping"],
+ ["浮水印三難?","強韌性 Robustness、不可察覺 Imperceptibility、容量 Capacity"],
+ ["LSB vs DCT 強韌性?","LSB 弱(易被壓縮毀);DCT 強(撐過 JPEG)"],
+ ["DCT 浮水印嵌哪?","中頻:低頻會被看見、高頻會被壓縮掉"],
+ ["高通 vs 低通?","高通=看邊緣(銳化);低通=變模糊(去雜訊)"],
+];
+const fb=document.getElementById('flipbox');
+CARDS.forEach(([f,b])=>{
+  const d=document.createElement('div');d.className='flip card';d.style.padding='0';
+  d.innerHTML=`<div class="flip-inner"><div class="flip-f">${f}</div>
+    <div class="flip-b"><span class="tag">答案</span>${b}</div></div>`;
+  d.onclick=()=>d.classList.toggle('on');
+  fb.appendChild(d);
+});
+</script>
+</body>
+</html>
