@@ -79,6 +79,20 @@
   .expl{display:none;margin-top:12px;padding:12px 14px;background:#0c1024;border-radius:9px;
     border-left:3px solid var(--accent2);font-size:.9rem}
   .expl.show{display:block}
+  .qprog{margin:8px 0 14px}
+  .qprog .lbl{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .qbar{height:8px;background:#0c1024;border-radius:6px;overflow:hidden}
+  .qbar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+    width:0;transition:width .3s}
+  .opt.lock{cursor:default;opacity:.95}
+  .resultbox{text-align:center;padding:24px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;margin:10px 0}
+  .resultbox .big{font-size:2rem;font-weight:800;margin:8px 0}
+  .wb{background:#241a22;border:1px solid #5a2a3a;border-radius:14px;padding:16px 18px;margin:22px 0}
+  .wb h3{color:var(--bad);margin:0 0 4px}
+  .wb-item{background:#0c1024;border-radius:9px;padding:10px 14px;margin:10px 0;font-size:.9rem}
+  .wb-item .qq{font-weight:600;margin-bottom:4px}
+  .wb-item .aa{color:var(--good)}
   .btn{background:var(--accent);color:#0b1020;border:none;padding:10px 20px;border-radius:10px;
     font-weight:700;cursor:pointer;font-size:.95rem}
   .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
@@ -615,14 +629,14 @@
 
 <!-- ============ 互動測驗 ============ -->
 <section id="test">
-  <h2>🧠 互動測驗(<span id="qcount"></span> 題)</h2>
-  <div class="card">只涵蓋<b>期末會考的 8 大主題</b>(已移除小考題)。作答後按下方<b>「批改 + 看詳解」</b>,每題會標出對錯並顯示說明。</div>
-  <div id="quizbox"></div>
-  <div style="text-align:center;margin-top:20px">
-    <button class="btn" onclick="grade()">批改 + 看詳解</button>
-    <button class="btn ghost" onclick="resetQuiz()">重做</button>
-  </div>
-  <div id="score"></div>
+  <h2>🧠 互動測驗(逐題作答)</h2>
+  <div class="card">只涵蓋<b>期末會考的 8 大主題</b>。<b>一題一題作答,選完馬上看對錯 + 詳解</b>,再按「下一題」。答錯的會自動進<b>錯題本</b>(下方),可以只練錯題,而且關掉網頁也記得。</div>
+
+  <div id="quizProg" class="qprog"></div>
+  <div id="quizStage"></div>
+
+  <!-- 錯題本 -->
+  <div id="wrongBook"></div>
 </section>
 
 <!-- ============ 閃卡 ============ -->
@@ -727,48 +741,91 @@ const QUIZ=[
   a:1,e:"池化只是挑數字(max/average),沒有要學的權重。卷積與全連接都有參數。"},
 ];
 
-const qc=document.getElementById('qcount'); if(qc) qc.textContent=QUIZ.length;
-const qbox=document.getElementById('quizbox');
-QUIZ.forEach((item,i)=>{
-  const d=document.createElement('div');d.className='q';
-  let opts=item.o.map((t,j)=>`<label class="opt" data-q="${i}" data-o="${j}">${String.fromCharCode(65+j)}. ${t}</label>`).join('');
-  d.innerHTML=`<div class="qnum">第 ${i+1} 題</div><p>${item.q}</p>${opts}
-    <div class="expl" id="e${i}"></div>`;
-  qbox.appendChild(d);
-});
-let answers={};
-qbox.addEventListener('click',e=>{
-  const o=e.target.closest('.opt');if(!o)return;
-  const qi=o.dataset.q;
-  document.querySelectorAll(`.opt[data-q="${qi}"]`).forEach(x=>x.classList.remove('sel'));
-  o.classList.add('sel');answers[qi]=+o.dataset.o;
-});
-function grade(){
-  let correct=0;
-  QUIZ.forEach((item,i)=>{
-    const chosen=answers[i];
-    document.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>{
-      const j=+x.dataset.o;x.classList.remove('correct','wrong');
-      if(j===item.a)x.classList.add('correct');
-      else if(j===chosen)x.classList.add('wrong');
-    });
-    const ex=document.getElementById('e'+i);
-    const ok=chosen===item.a;if(ok)correct++;
-    ex.innerHTML=(ok?'<span class="good">✓ 答對 </span>':'<span class="bad">✗ 答錯 </span>')+item.e;
-    ex.classList.add('show');
+/* ---------- 逐題測驗引擎 + 錯題本(localStorage 持久) ---------- */
+const stage=document.getElementById('quizStage');
+const prog=document.getElementById('quizProg');
+const wbEl=document.getElementById('wrongBook');
+const WB_KEY='mm_wrongbook_v1';
+const loadWB=()=>{try{return JSON.parse(localStorage.getItem(WB_KEY))||[]}catch(e){return[]}};
+const saveWB=a=>{try{localStorage.setItem(WB_KEY,JSON.stringify(a))}catch(e){}};
+const wbAdd=q=>{const a=loadWB(); if(!a.includes(q)){a.push(q);saveWB(a)}};
+const wbRemove=q=>{saveWB(loadWB().filter(x=>x!==q))};
+
+let deck=[], pos=0, roundWrong=[], answeredThis=false;
+
+function startQuiz(indices){
+  deck=(indices&&indices.length)?indices:QUIZ.map((_,i)=>i);
+  pos=0; roundWrong=[]; renderQ(); renderWB();
+}
+function renderProg(){
+  const pct=Math.round(pos/deck.length*100);
+  prog.innerHTML=`<div class="lbl"><span>第 ${pos+1} / ${deck.length} 題</span><span>本回合答錯 ${roundWrong.length}</span></div>
+    <div class="qbar"><div class="qbar-fill" style="width:${pct}%"></div></div>`;
+}
+function renderQ(){
+  if(pos>=deck.length){renderResult();return;}
+  renderProg(); answeredThis=false;
+  const item=QUIZ[deck[pos]];
+  const opts=item.o.map((t,j)=>`<label class="opt" data-o="${j}">${String.fromCharCode(65+j)}. ${t}</label>`).join('');
+  stage.innerHTML=`<div class="q">
+      <div class="qnum">第 ${pos+1} 題</div><p>${item.q}</p>
+      <div>${opts}</div>
+      <div class="expl" id="curExpl"></div>
+      <div id="nextWrap" style="text-align:center;margin-top:14px;display:none">
+        <button class="btn" id="nextBtn"></button></div>
+    </div>`;
+  stage.querySelectorAll('.opt').forEach(o=>o.onclick=()=>choose(+o.dataset.o));
+}
+function choose(j){
+  if(answeredThis)return; answeredThis=true;
+  const idx=deck[pos], item=QUIZ[idx], ok=(j===item.a);
+  stage.querySelectorAll('.opt').forEach(o=>{
+    const k=+o.dataset.o; o.classList.add('lock');
+    if(k===item.a)o.classList.add('correct'); else if(k===j)o.classList.add('wrong');
   });
-  const s=document.getElementById('score');
-  const pct=Math.round(correct/QUIZ.length*100);
-  s.innerHTML=`你的分數:<span class="${pct>=80?'good':pct>=60?'':'bad'}">${correct} / ${QUIZ.length}(${pct}分)</span>`;
-  s.scrollIntoView({behavior:'smooth'});
+  const ex=document.getElementById('curExpl');
+  ex.innerHTML=(ok?'<span class="good">✓ 答對 </span>':'<span class="bad">✗ 答錯 </span>')+item.e;
+  ex.classList.add('show');
+  if(ok){wbRemove(item.q);} else {if(!roundWrong.includes(idx))roundWrong.push(idx); wbAdd(item.q);}
+  renderWB();
+  const nb=document.getElementById('nextBtn');
+  nb.textContent=(pos+1<deck.length)?'下一題 ▶':'看結果 🏁';
+  nb.onclick=()=>{pos++; renderQ();};
+  document.getElementById('nextWrap').style.display='block';
 }
-function resetQuiz(){
-  answers={};
-  document.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel','correct','wrong'));
-  document.querySelectorAll('.expl').forEach(x=>{x.classList.remove('show');x.innerHTML='';});
-  document.getElementById('score').innerHTML='';
-  window.scrollTo({top:0,behavior:'smooth'});
+function renderResult(){
+  prog.innerHTML='';
+  const total=deck.length, wrong=roundWrong.length, correct=total-wrong;
+  const pct=Math.round(correct/total*100), cls=pct>=80?'good':pct>=60?'':'bad';
+  window.__lastWrong=roundWrong.slice();
+  stage.innerHTML=`<div class="resultbox">
+     <div>本回合結果</div>
+     <div class="big ${cls}">${correct} / ${total}(${pct} 分)</div>
+     <div style="margin-top:14px">
+       <button class="btn" onclick="startQuiz()">全部重做</button>
+       ${wrong?`<button class="btn ghost" onclick="startQuiz(window.__lastWrong)">只練這回合錯的 (${wrong})</button>`:'<div class="good" style="margin-top:8px">全對!太強了 🎉</div>'}
+     </div></div>`;
+  renderWB();
 }
+function renderWB(){
+  const items=loadWB().map(q=>QUIZ.find(it=>it.q===q)).filter(Boolean);
+  if(!items.length){wbEl.innerHTML=''; return;}
+  let html=`<div class="wb"><h3>📕 錯題本(${items.length})</h3>
+    <div class="tag">答錯的題會留在這裡(關掉網頁也記得);下次答對就自動移除。</div>`;
+  items.forEach(it=>{
+    html+=`<div class="wb-item"><div class="qq">${it.q}</div>
+      <div class="aa">✓ 正解:${String.fromCharCode(65+it.a)}. ${it.o[it.a]}</div>
+      <div class="tag">${it.e}</div></div>`;
+  });
+  const idxs=items.map(it=>QUIZ.indexOf(it));
+  html+=`<div style="text-align:center;margin-top:12px">
+      <button class="btn" onclick='startQuiz(${JSON.stringify(idxs)})'>只練錯題 (${items.length})</button>
+      <button class="btn ghost" onclick="clearWB()">清空錯題本</button>
+    </div></div>`;
+  wbEl.innerHTML=html;
+}
+function clearWB(){saveWB([]); renderWB();}
+startQuiz();
 
 /* ---------- 閃卡 ---------- */
 const CARDS=[
