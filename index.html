@@ -87,7 +87,7 @@
 <body>
 <header><div class="wrap">
   <h1>多媒體系統 · 期末複習網站
-    <small>東吳大學 資二A · 涵蓋小考錯題 + 期末 8 大重點 · 點上方分頁切換</small></h1>
+    <small>東吳大學 資二A · 教授確認考 8 大重點(+ 小考補充) · 點上方分頁切換</small></h1>
   <nav id="nav"></nav>
 </div></header>
 
@@ -96,44 +96,57 @@
 <!-- ============ 總覽 ============ -->
 <section id="home" class="active">
   <h2>📌 複習地圖</h2>
+
+  <div class="fix" style="border-width:2px">
+    <h4 style="font-size:1.05rem">✅ 教授確認:期末就考這 8 題(這是重點,先念這裡!)</h4>
+    <ol style="margin:8px 0 4px;columns:2;column-gap:30px">
+      <li><a onclick="go('exam')">亮度 / 色度差異</a></li>
+      <li><a onclick="go('exam')">彩色影像壓縮流程</a></li>
+      <li><a onclick="go('exam')">DCT 係數解讀</a></li>
+      <li><a onclick="go('exam')">卷積層 Convolution</a></li>
+      <li><a onclick="go('exam')">池化層 Pooling</a></li>
+      <li><a onclick="go('exam')">CNN 訓練的 2 個問題</a></li>
+      <li><a onclick="go('exam')">三因子的兩難</a></li>
+      <li><a onclick="go('exam')">浮水印 LSB / DCT</a></li>
+    </ol>
+    <p style="margin:6px 0 0"><b>👉 直接點上方「期末8重點(會考)」分頁開始念。</b></p>
+  </div>
+
   <div class="card">
-    <p>這個網站把你的內容分成三塊。建議順序:先看 <b>小考錯題</b> 把扣分觀念補回來,再讀 <b>期末 8 重點</b>,最後做 <b>互動測驗</b> 自我檢測。</p>
-  </div>
-  <div class="grid two">
-    <div class="card">
-      <h3 style="margin-top:4px">① 小考錯題詳解</h3>
-      <p class="tag">你真正被扣分的地方</p>
-      <ul class="toc">
-        <li><a onclick="go('quiz')">Run-Length 編碼對照表</a> — 二進位轉換陷阱</li>
-        <li><a onclick="go('quiz')">前綴碼是否正確</a> — 為什麼 D 錯</li>
-        <li><a onclick="go('quiz')">高通 / 低通濾波判斷</a></li>
-        <li><a onclick="go('quiz')">Huffman Tree 建構</a></li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3 style="margin-top:4px">② 期末 8 大重點</h3>
-      <p class="tag">老師指定考題</p>
-      <ul class="toc">
-        <li><a onclick="go('exam')">亮度 / 色度差異</a> · <a onclick="go('exam')">彩色影像壓縮流程</a></li>
-        <li><a onclick="go('exam')">DCT 係數解讀</a> · <a onclick="go('exam')">卷積層</a> · <a onclick="go('exam')">池化層</a></li>
-        <li><a onclick="go('exam')">CNN 訓練 2 問題</a> · <a onclick="go('exam')">三因子兩難</a> · <a onclick="go('exam')">浮水印 LSB/DCT</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="key">💡 <b>考前 5 個最常被當陷阱的點</b>
+    <p><b>怎麼用這個網站:</b></p>
     <ul>
-      <li>轉 <code>YCbCr</code> 的原因 = 人眼對<b>亮度敏感、色度不敏感</b> → 色度可次取樣。</li>
-      <li>DCT:<b>左上 = DC = 平均亮度</b>;<b>右下 = 高頻 = 細節</b>;能量集中低頻 → 壓縮可行。</li>
-      <li>Pooling <b>沒有可學習參數</b>(常考是非題)。</li>
-      <li>浮水印三難:<b>強韌性 / 不可察覺性 / 容量</b> 不可兼得。</li>
-      <li>前綴碼:<b>任何碼字都不能是另一碼字的前綴</b>,否則無法唯一解碼。</li>
+      <li>🎯 <b>期末8重點(會考)</b> — 教授確認的範圍,<b>主力放這裡</b>。</li>
+      <li>📝 <b>小考補充(不一定考)</b> — 你那張小考的詳解(RLE / Huffman / 高通)。<b>不在確認範圍</b>,但觀念跟第 2、3 題相通,行有餘力再看。</li>
+      <li>🧠 <b>互動測驗</b> 與 ⚡ <b>記憶閃卡</b> — 兩邊內容都涵蓋,考前自我檢測。</li>
+    </ul>
+  </div>
+
+  <h3>📊 小考主題 vs 期末確認範圍 對照</h3>
+  <div class="card">
+    <table>
+      <tr><th>小考考過的主題</th><th>在期末 8 題裡嗎?</th><th>還要念嗎?</th></tr>
+      <tr><td>Huffman / RLE 編碼</td><td>🔸 觀念藏在第 2 題「壓縮流程」的熵編碼步驟</td><td>觀念要懂,不必背小考細節</td></tr>
+      <tr><td>高通 / 低通濾波</td><td>🔸 與第 3 題 DCT「高頻/低頻」相通</td><td>懂概念即可</td></tr>
+      <tr><td>前綴碼是否正確</td><td>❌ 不在確認的 8 題內</td><td>低優先</td></tr>
+      <tr><td colspan="3" class="good">結論:期末重心在 <b>CNN(4–6 題)</b> 與 <b>浮水印(7–8 題)</b> —— 這些小考完全沒考,務必補強!</td></tr>
+    </table>
+  </div>
+
+  <div class="key">💡 <b>考前 5 個最常被當陷阱的點(都在會考範圍內)</b>
+    <ul>
+      <li>轉 <code>YCbCr</code> 的原因 = 人眼對<b>亮度敏感、色度不敏感</b> → 色度可次取樣。(第 1、2 題)</li>
+      <li>DCT:<b>左上 = DC = 平均亮度</b>;<b>右下 = 高頻 = 細節</b>;能量集中低頻 → 壓縮可行。(第 3 題)</li>
+      <li>Pooling <b>沒有可學習參數</b>(常考是非題)。(第 5 題)</li>
+      <li>CNN 兩大訓練問題 = <b>梯度消失 + 過擬合</b>。(第 6 題)</li>
+      <li>浮水印三難:<b>強韌性 / 不可察覺性 / 容量</b> 不可兼得;DCT 嵌<b>中頻</b>。(第 7、8 題)</li>
     </ul>
   </div>
 </section>
 
 <!-- ============ 小考錯題 ============ -->
 <section id="quiz">
-  <h2>📝 小考錯題完整詳解</h2>
+  <h2>📝 小考錯題完整詳解(補充,非確認範圍)</h2>
+  <div class="key">⚠️ <b>這頁不是教授確認的期末範圍</b>。期末確認考的是<a onclick="go('exam')">「期末8重點」那 8 題</a>,請<b>優先念那邊</b>。這頁是你小考的詳解,觀念跟期末第 2 題(壓縮流程)、第 3 題(DCT 高低頻)相通,行有餘力再看。</div>
   <div class="card">這份是你那張 <b>69 分</b>小考的逐題拆解。每題都先講<b>觀念</b>,再放<b>完整逐步解</b>,最後標出<b>你卷子上實際錯在哪一步</b>。Run-Length(Q1、Q4)是你失分最多的地方,放在最前面講最透。</div>
 
   <!-- ===== 觀念總綱:Run-Length ===== -->
@@ -463,7 +476,7 @@
 <script>
 /* ---------- 分頁 ---------- */
 const tabs=[
-  ['home','總覽'],['quiz','小考錯題'],['exam','期末8重點'],
+  ['home','總覽'],['exam','期末8重點(會考)'],['quiz','小考補充'],
   ['test','互動測驗'],['cards','記憶閃卡']
 ];
 const nav=document.getElementById('nav');
