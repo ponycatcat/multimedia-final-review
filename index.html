@@ -403,19 +403,45 @@
   <!-- ===== 3 ===== -->
   <h3>3 · DCT 係數的解讀(Interpretation of DCT Coefficients)</h3>
   <div class="card">
-    <div class="plain"><h4>💡 白話秒懂</h4>
-      DCT 把一個 8×8 小區塊,改寫成一份「<b>波紋食譜</b>」:從<b>完全平的</b>(平均亮度)到<b>越來越密的波紋</b>(細節)。<br>
-      • <b>左上角那一格</b> = 整塊的平均亮度,叫 <b>DC</b>,數字最大。<br>
-      • <b>越往右下</b> = 波紋越密 = <b>高頻</b> = 細節/邊緣。<br>
-      自然照片大多是平滑的,所以<b>大數字都擠在左上、右下幾乎是 0</b> → 右下那些就可以放心丟掉(這就是壓縮)。</div>
-    <div class="tri"> 8×8 DCT 係數矩陣
-┌─────────────→ 水平頻率變高
-│ DC  低頻 …………
-│ 低   ↘
-│ 頻      (能量集中在左上角)
-│            ↘
-↓               高頻(細節/邊緣,接近 0)
-垂直頻率變高</div>
+    <div class="plain"><h4>💡 第一步:先懂「影像的頻率」</h4>
+      <b>頻率 = 亮度「變化得多快」</b>(看相鄰像素之間變化快慢):<br>
+      • 平滑的天空、皮膚、牆面 → 變化很慢 → <b>低頻</b><br>
+      • 斑馬條紋、頭髮、文字邊緣 → 忽明忽暗變很快 → <b>高頻</b><br>
+      👉 一句話:<b>平滑 = 低頻;細節/邊緣 = 高頻。</b></div>
+
+    <div class="plain"><h4>💡 第二步:用「音樂」理解 DCT(關鍵比喻)</h4>
+      一首歌可拆成<b>低音 + 高音</b>的混合,等化器(EQ)每根滑桿 = 「某個頻率要多大聲」。<br>
+      <b>DCT 對影像做一樣的事</b>:把一個 8×8 方塊,拆成 <b>64 種固定「波紋圖案」的混合</b>,告訴你<b>每種圖案要加多少</b>。那個「要加多少」的數字 = <b>係數(coefficient)</b>。係數大 = 這圖案很明顯;係數 ≈ 0 = 幾乎沒有。</div>
+
+    <h4 style="color:var(--accent2);margin:18px 0 4px">🎨 第三步:這 64 種「波紋圖案」長這樣(程式實際畫出)</h4>
+    <div style="text-align:center;background:#0c1024;border-radius:10px;padding:14px">
+      <div class="tag" style="margin-bottom:6px">水平頻率 u(直條紋變密) ──────►</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+        <div class="tag" style="writing-mode:vertical-rl">垂直頻率 v(橫條紋變密) ▼</div>
+        <canvas id="dctBasis" style="max-width:100%;image-rendering:pixelated;border-radius:6px"></canvas>
+      </div>
+      <div class="tag" style="margin-top:8px">
+        <b style="color:var(--accent2)">左上角</b> = 一片平灰(沒波紋)= <b>DC = 平均亮度</b>;
+        <b style="color:var(--bad)">右下角</b> = 最細棋盤格 = <b>最高頻(細節)</b>。<br>
+        任何 8×8 方塊,都是把這 64 張圖各乘上自己的係數再疊起來。
+      </div>
+    </div>
+
+    <h4 style="color:var(--accent2);margin:18px 0 4px">🔢 第四步:超小具體例子(用一排 4 個像素)</h4>
+    <table>
+      <tr><th>像素亮度</th><th>長相</th><th>係數結果</th><th>能量在哪</th></tr>
+      <tr><td><code>50 50 50 50</code></td><td>完全平</td><td><code>[50, 0, 0, 0]</code></td><td class="good">只有 DC</td></tr>
+      <tr><td><code>20 40 60 80</code></td><td>平滑漸層</td><td><code>[50, 大, 小, ≈0]</code></td><td class="good">集中在低頻</td></tr>
+      <tr><td><code>80 0 80 0</code></td><td>忽明忽暗</td><td><code>[40, 0, 0, 大]</code></td><td class="bad">跑到高頻</td></tr>
+    </table>
+    <p class="tag">→ 越平滑,能量越集中前面(低頻);越細碎跳動,能量才跑到後面(高頻)。</p>
+
+    <div class="key"><h4 style="margin:0 0 6px;color:var(--warn)">💡 第五步:為什麼這樣能壓縮?</h4>
+      ① 自然照片大多平滑 → 大數字擠左上、右下幾乎是 0(<b>能量集中 energy compaction</b>)。<br>
+      ② 人眼對高頻細節不敏感 → 右下那些小數字<b>直接丟掉/歸零</b>也看不太出來。<br>
+      ③ 一堆 0 超好壓(RLE 一次記掉)。<br>
+      <b>注意:DCT 本身不失真</b>,它只是「把不重要的搬到右下角」,真正丟東西的是後面的<b>量化</b>。</div>
+
     <table class="bil">
       <tr><th>英文</th><th>中文</th></tr>
       <tr><td>DC coefficient (top-left)</td><td>直流係數 = 平均亮度</td></tr>
@@ -741,6 +767,40 @@ CARDS.forEach(([f,b])=>{
   d.onclick=()=>d.classList.toggle('on');
   fb.appendChild(d);
 });
+
+/* ---------- 畫 8×8 DCT 波紋基底圖 ---------- */
+(function drawDCTBasis(){
+  const c=document.getElementById('dctBasis');
+  if(!c||!c.getContext) return;
+  const N=8, tile=30, gap=3, pad=3;
+  const size=N*tile+(N-1)*gap+pad*2;
+  c.width=size; c.height=size;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#0c1024'; ctx.fillRect(0,0,size,size);
+  const img=ctx.createImageData(tile,tile);
+  for(let v=0; v<N; v++){          // v = 垂直頻率(列)
+    for(let u=0; u<N; u++){        // u = 水平頻率(行)
+      for(let y=0; y<tile; y++){
+        for(let x=0; x<tile; x++){
+          // DCT 基底:cos 波,u/v 決定一格內有幾個半週期
+          const fx=Math.cos(u*Math.PI*(x+0.5)/tile);
+          const fy=Math.cos(v*Math.PI*(y+0.5)/tile);
+          const val=fx*fy;                 // -1 ~ 1
+          const g=Math.round((val+1)/2*255);
+          const idx=(y*tile+x)*4;
+          img.data[idx]=g; img.data[idx+1]=g; img.data[idx+2]=g; img.data[idx+3]=255;
+        }
+      }
+      ctx.putImageData(img, pad+u*(tile+gap), pad+v*(tile+gap));
+    }
+  }
+  // 左上角 DC 標記框
+  ctx.strokeStyle='#7ee0c0'; ctx.lineWidth=2;
+  ctx.strokeRect(pad-1, pad-1, tile+2, tile+2);
+  // 右下角高頻標記框
+  ctx.strokeStyle='#ff7a8a';
+  ctx.strokeRect(pad+(N-1)*(tile+gap)-1, pad+(N-1)*(tile+gap)-1, tile+2, tile+2);
+})();
 </script>
 </body>
 </html>
