@@ -47,6 +47,15 @@
   .key{background:linear-gradient(90deg,#1d2748,#1a1f35);border-left:4px solid var(--warn);
     padding:12px 16px;border-radius:8px;margin:14px 0}
   .key b{color:var(--warn)}
+  .plain{background:#0a2230;border-left:4px solid var(--accent2);padding:12px 16px;
+    border-radius:8px;margin:14px 0}
+  .plain h4{margin:0 0 6px;color:var(--accent2);font-size:1rem}
+  .answer{background:#1f1830;border:1px solid #4d3b75;border-radius:10px;padding:14px 18px;margin:14px 0}
+  .answer h4{margin:0 0 8px;color:#cdaaff;font-size:1rem}
+  .answer .en{display:block;color:#f2eeff;margin:6px 0 2px}
+  .answer .zh{display:block;color:var(--muted);font-size:.84rem;margin-bottom:8px}
+  .bil th{color:#cdaaff}
+  .bil td:first-child{color:#9fe0ff;font-family:"Consolas",monospace}
   ul{margin:8px 0;padding-left:22px}
   li{margin:5px 0}
   .tri{text-align:center;font-family:monospace;white-space:pre;color:var(--accent2);
@@ -327,126 +336,224 @@
 
 <!-- ============ 期末 8 重點 ============ -->
 <section id="exam">
-  <h2>🎯 期末 8 大重點</h2>
+  <h2>🎯 期末 8 大重點(中英對照 + 英文作答範本)</h2>
+  <div class="card">考卷是<b>英文</b>,所以每題都有:💡<b>白話秒懂</b>(先懂概念)→ 📖<b>中英術語</b>(關鍵字)→ ✍️<b>英文作答範本</b>(可直接照寫)。把紫色框的英文背下來,考試就能寫出來。</div>
 
-  <h3>1 · 亮度(Luminance）vs 色度(Chrominance)</h3>
+  <!-- ===== 1 ===== -->
+  <h3>1 · 亮度 vs 色度(Luminance vs Chrominance)</h3>
   <div class="card">
+    <div class="plain"><h4>💡 白話秒懂</h4>
+      想像<b>黑白電視 → 彩色電視</b>。黑白畫面的明暗 = <b>亮度(Y)</b>;後來疊上去的顏色 = <b>色度(Cb, Cr)</b>。<br>
+      人眼是「<b>看明暗很準、看顏色很粗</b>」的(視網膜感光細胞:管明暗的桿細胞約 1.2 億個,管顏色的錐細胞只約 600 萬)。所以我們可以<b>偷工減料</b>:顏色存得粗一點(次取樣),人眼幾乎看不出來,卻能省很多資料。</div>
     <table>
-      <tr><th></th><th>亮度 Y</th><th>色度 Cb, Cr</th></tr>
-      <tr><td>攜帶</td><td>明暗 / 灰階細節</td><td>顏色資訊(色差)</td></tr>
-      <tr><td>人眼</td><td class="good">非常敏感</td><td class="bad">較不敏感</td></tr>
-      <tr><td>定義</td><td>Y=0.299R+0.587G+0.114B</td><td>Cb=B−Y, Cr=R−Y(縮放)</td></tr>
-      <tr><td>壓縮</td><td>保留完整解析度</td><td>可<b>次取樣</b>(4:2:2 / 4:2:0)</td></tr>
+      <tr><th></th><th>亮度 Luminance (Y)</th><th>色度 Chrominance (Cb, Cr)</th></tr>
+      <tr><td>攜帶</td><td>明暗 / 灰階細節 brightness</td><td>顏色資訊 color (色差 color difference)</td></tr>
+      <tr><td>人眼</td><td class="good">非常敏感 sensitive</td><td class="bad">較不敏感 less sensitive</td></tr>
+      <tr><td>壓縮時</td><td>保留完整解析度</td><td>可<b>次取樣 subsampling</b>(4:2:0)</td></tr>
     </table>
-    <div class="key">💡 <b>考點</b>:為何先 RGB→YCbCr?因為人眼對亮度敏感、對色度不敏感,把色度資料丟一些幾乎看不出來,可省位元。</div>
+    <table class="bil">
+      <tr><th>英文</th><th>中文</th></tr>
+      <tr><td>luminance (Y)</td><td>亮度 / 明度</td></tr>
+      <tr><td>chrominance (Cb, Cr)</td><td>色度</td></tr>
+      <tr><td>the human eye is more sensitive to …</td><td>人眼對…較敏感</td></tr>
+      <tr><td>chroma subsampling (4:2:0)</td><td>色度次取樣</td></tr>
+    </table>
+    <div class="answer"><h4>✍️ 英文作答範本</h4>
+      <span class="en">Luminance (Y) represents the <b>brightness</b> of an image, while chrominance (Cb, Cr) represents the <b>color</b> information.</span>
+      <span class="zh">亮度代表影像的明暗,色度代表顏色資訊。</span>
+      <span class="en">Because the human eye is <b>more sensitive to luminance than to chrominance</b>, the chrominance components can be <b>subsampled</b> (e.g., 4:2:0) during compression to reduce data size with little perceptible loss of quality.</span>
+      <span class="zh">因為人眼對亮度比色度敏感,壓縮時可把色度次取樣以省資料,且幾乎看不出畫質損失。</span></div>
   </div>
 
-  <h3>2 · 彩色影像壓縮流程(JPEG)</h3>
+  <!-- ===== 2 ===== -->
+  <h3>2 · 彩色影像壓縮流程(Compression Flow of Color Images)</h3>
   <div class="card">
+    <div class="plain"><h4>💡 白話秒懂</h4>
+      像<b>行李打包</b>:① 先把衣服換成好折的格式(換色彩空間)→ ② 把用不到的丟掉(色度次取樣)→ ③ 分裝成小袋(切 8×8 區塊)→ ④ 真空壓縮(DCT 轉頻率)→ ⑤ 丟掉看不出的細節(量化,<b>就是這步會失真</b>)→ ⑥⑦ 把空隙壓緊、綁好(RLE + Huffman,不再丟東西)。</div>
     <div class="tri">RGB 影像
   │
-① 色彩轉換  RGB → YCbCr
+① 色彩轉換 Color transform: RGB → YCbCr
   │
-② 色度次取樣(4:2:0,Cb/Cr 解析度減半)
+② 色度次取樣 Chroma subsampling (4:2:0)
   │
-③ 每個通道切成 8×8 區塊
+③ 切成 8×8 區塊 Divide into 8×8 blocks
   │
-④ 對每塊做 DCT(空間域 → 頻率域)
+④ DCT(空間域→頻率域)Spatial → Frequency
   │
-⑤ 量化 Quantization(除以量化表並四捨五入)  ← 失真就在這
+⑤ 量化 Quantization  ← 唯一失真 (lossy) 步驟
   │
-⑥ Zig-zag 掃描 → 行程長度編碼 RLE
+⑥ Zig-zag 掃描 + 行程編碼 RLE
   │
-⑦ 熵編碼 Huffman / 算術編碼(無失真)
+⑦ 熵編碼 Entropy coding (Huffman)  ← 無失真
   │
-壓縮檔 .jpg</div>
-    <p class="tag">解壓縮 = 反向:熵解碼 → 反量化 → IDCT → 色度上取樣 → YCbCr→RGB。</p>
-    <div class="key">💡 唯一造成<b>失真(lossy)</b>的步驟是<b>⑤ 量化</b>;⑥⑦ 是無失真。</div>
+壓縮檔 Compressed .jpg</div>
+    <table class="bil">
+      <tr><th>英文</th><th>中文</th></tr>
+      <tr><td>color space transform</td><td>色彩空間轉換</td></tr>
+      <tr><td>quantization</td><td>量化(失真來源)</td></tr>
+      <tr><td>run-length encoding (RLE)</td><td>行程長度編碼</td></tr>
+      <tr><td>entropy / Huffman coding</td><td>熵 / 霍夫曼編碼</td></tr>
+      <tr><td>lossy / lossless</td><td>有失真 / 無失真</td></tr>
+    </table>
+    <div class="answer"><h4>✍️ 英文作答範本(照流程寫即可)</h4>
+      <span class="en">First, the image is converted from <b>RGB to YCbCr</b>. The chrominance is then <b>subsampled</b>. Each channel is divided into <b>8×8 blocks</b>, and a <b>DCT</b> transforms each block into frequency coefficients. The coefficients are <b>quantized</b> (this is the only <b>lossy</b> step), then <b>zig-zag scanned</b> and compressed with <b>run-length</b> and <b>Huffman (entropy) coding</b>.</span>
+      <span class="zh">先 RGB→YCbCr → 色度次取樣 → 切 8×8 → DCT → 量化(唯一失真)→ zig-zag + RLE + Huffman 編碼。</span></div>
   </div>
 
-  <h3>3 · DCT 係數的解讀</h3>
+  <!-- ===== 3 ===== -->
+  <h3>3 · DCT 係數的解讀(Interpretation of DCT Coefficients)</h3>
   <div class="card">
-    <p>對 8×8 區塊做 2D-DCT,得到 8×8 的係數矩陣:</p>
-    <ul>
-      <li><b>DC 係數</b>(左上角 [0,0]):整塊的<b>平均亮度</b>,數值最大、最重要。</li>
-      <li><b>AC 係數</b>(其餘):代表各種<b>空間頻率</b>。
-        <ul>
-          <li>靠<b>左上 = 低頻</b> = 平滑、緩慢變化(能量集中於此)。</li>
-          <li>靠<b>右下 = 高頻</b> = 細節、邊緣、雜訊。</li>
-        </ul>
-      </li>
-      <li><b>能量集中(energy compaction)</b>:自然影像大部分能量集中在少數低頻係數,高頻接近 0。</li>
-    </ul>
-    <div class="key">💡 這正是量化能壓縮的原因:把人眼不敏感的<b>高頻係數丟掉/歸零</b>,檔案變小而看不太出來。</div>
+    <div class="plain"><h4>💡 白話秒懂</h4>
+      DCT 把一個 8×8 小區塊,改寫成一份「<b>波紋食譜</b>」:從<b>完全平的</b>(平均亮度)到<b>越來越密的波紋</b>(細節)。<br>
+      • <b>左上角那一格</b> = 整塊的平均亮度,叫 <b>DC</b>,數字最大。<br>
+      • <b>越往右下</b> = 波紋越密 = <b>高頻</b> = 細節/邊緣。<br>
+      自然照片大多是平滑的,所以<b>大數字都擠在左上、右下幾乎是 0</b> → 右下那些就可以放心丟掉(這就是壓縮)。</div>
+    <div class="tri"> 8×8 DCT 係數矩陣
+┌─────────────→ 水平頻率變高
+│ DC  低頻 …………
+│ 低   ↘
+│ 頻      (能量集中在左上角)
+│            ↘
+↓               高頻(細節/邊緣,接近 0)
+垂直頻率變高</div>
+    <table class="bil">
+      <tr><th>英文</th><th>中文</th></tr>
+      <tr><td>DC coefficient (top-left)</td><td>直流係數 = 平均亮度</td></tr>
+      <tr><td>AC coefficients</td><td>交流係數 = 各種頻率</td></tr>
+      <tr><td>low / high frequency</td><td>低頻(平滑)/ 高頻(細節)</td></tr>
+      <tr><td>energy compaction</td><td>能量集中</td></tr>
+    </table>
+    <div class="answer"><h4>✍️ 英文作答範本</h4>
+      <span class="en">The <b>DC coefficient</b> (top-left) represents the <b>average brightness</b> of the 8×8 block. The other <b>AC coefficients</b> represent spatial frequencies: <b>low frequencies</b> (top-left) correspond to smooth areas, and <b>high frequencies</b> (bottom-right) correspond to edges and fine detail.</span>
+      <span class="zh">DC=平均亮度;AC=各頻率,左上低頻(平滑)、右下高頻(細節)。</span>
+      <span class="en">Because of <b>energy compaction</b>, most energy concentrates in the low-frequency coefficients, so the high-frequency ones can be discarded during quantization to achieve compression.</span>
+      <span class="zh">能量集中在低頻,高頻可在量化時丟掉以達壓縮。</span></div>
   </div>
 
-  <h3>4 · 卷積層(Convolutional Layer)</h3>
+  <!-- ===== 4 ===== -->
+  <h3>4 · 卷積層(Convolution Layer)</h3>
   <div class="card">
-    <ul>
-      <li>用一組可學習的小<b>濾波器 / 卷積核(kernel,如 3×3)</b>滑過影像。</li>
-      <li>每個位置算<b>內積(加權和)</b> → 產生<b>特徵圖(feature map)</b>。</li>
-      <li><b>用途</b>:偵測局部特徵 — 淺層找邊緣/角點/紋理,深層組成形狀/物件。</li>
-      <li><b>兩大特性</b>:
-        <ul>
-          <li><b>局部連接</b>:每個神經元只看小範圍(receptive field)。</li>
-          <li><b>權重共享</b>:同一核掃整張圖 → 參數大幅減少、具<b>平移不變性</b>。</li>
-        </ul>
-      </li>
-      <li><b>超參數</b>:濾波器數量(深度)、核大小、<b>stride 步幅</b>、<b>padding 補邊</b>。後接非線性<b>激活(ReLU)</b>。</li>
-    </ul>
+    <div class="plain"><h4>💡 白話秒懂</h4>
+      想像一個小<b>印章/放大鏡(濾波器 filter,例如 3×3)</b>,在照片上<b>一格一格滑過去</b>,專門找某一種圖案(例如「直線邊緣」)。哪裡有這個圖案,那裡就亮起來 → 得到一張<b>特徵圖(feature map)</b>。<br>
+      同一個印章蓋全圖(<b>權重共享</b>),所以①要學的參數很少 ②圖案出現在哪都找得到(<b>平移不變</b>)。淺層找邊緣,深層把邊緣組成形狀、物件。</div>
+    <table class="bil">
+      <tr><th>英文</th><th>中文</th></tr>
+      <tr><td>filter / kernel</td><td>濾波器 / 卷積核</td></tr>
+      <tr><td>feature map</td><td>特徵圖</td></tr>
+      <tr><td>slide / convolve over the image</td><td>滑過影像做卷積</td></tr>
+      <tr><td>weight sharing</td><td>權重共享</td></tr>
+      <tr><td>local connectivity / receptive field</td><td>局部連接 / 感受野</td></tr>
+      <tr><td>stride / padding</td><td>步幅 / 補邊</td></tr>
+    </table>
+    <div class="answer"><h4>✍️ 英文作答範本</h4>
+      <span class="en">A convolution layer applies small learnable <b>filters (kernels)</b> that <b>slide over the input image</b>. At each position it computes a weighted sum (dot product), producing a <b>feature map</b> that detects local features such as edges.</span>
+      <span class="zh">卷積層用可學習的小濾波器滑過影像,每處算加權和,產生偵測邊緣等局部特徵的特徵圖。</span>
+      <span class="en">Thanks to <b>weight sharing</b> and <b>local connectivity</b>, it uses far fewer parameters and is <b>translation-invariant</b>.</span>
+      <span class="zh">因權重共享與局部連接,參數少且具平移不變性。</span></div>
   </div>
 
+  <!-- ===== 5 ===== -->
   <h3>5 · 池化層(Pooling Layer)</h3>
   <div class="card">
-    <ul>
-      <li>對特徵圖<b>降取樣(down-sampling)</b>,縮小寬×高。</li>
-      <li>在小視窗(如 2×2)上取值:<b>最大池化 Max</b>(取最大,最常用)、<b>平均池化 Average</b>(取平均)。</li>
-      <li><b>好處</b>:減少參數與計算、提供<b>平移不變性</b>、抑制<b>過擬合</b>、擴大感受野。</li>
-    </ul>
-    <div class="key">💡 <b>常考是非題</b>:池化層<b>沒有可學習參數</b>(它是固定運算,不像卷積有權重)。</div>
+    <div class="plain"><h4>💡 白話秒懂</h4>
+      就是<b>縮圖</b>:把特徵圖變小,但保留重點。看每個 2×2 小方塊,<b>只留最大的那個值(Max pooling)</b>或取平均(Average pooling)。<br>
+      好處:資料量變小、計算變快、而且圖案<b>稍微移位也不影響</b>(平移不變)。<b>重點記:池化沒有要學的權重</b>(它只是挑數字,不像卷積有參數)。</div>
+    <table class="bil">
+      <tr><th>英文</th><th>中文</th></tr>
+      <tr><td>pooling / down-sampling</td><td>池化 / 降採樣</td></tr>
+      <tr><td>max pooling / average pooling</td><td>最大 / 平均池化</td></tr>
+      <tr><td>translation invariance</td><td>平移不變性</td></tr>
+      <tr><td>no learnable parameters</td><td>沒有可學習參數</td></tr>
+    </table>
+    <div class="answer"><h4>✍️ 英文作答範本</h4>
+      <span class="en">A pooling layer <b>down-samples</b> each feature map, e.g., <b>max pooling</b> keeps the maximum value in each 2×2 window. It reduces computation, controls overfitting, and provides <b>translation invariance</b>. Pooling has <b>no learnable parameters</b>.</span>
+      <span class="zh">池化把特徵圖降採樣(如取 2×2 最大值),減少計算、抑制過擬合、提供平移不變性,且沒有可學習參數。</span></div>
   </div>
 
-  <h3>6 · CNN 訓練的兩個問題</h3>
+  <!-- ===== 6 ===== -->
+  <h3>6 · CNN 訓練的兩個問題(Two Training Issues of CNN)</h3>
   <div class="card">
+    <div class="plain"><h4>💡 白話秒懂</h4>
+      ① <b>梯度消失</b>:訓練時「修正訊號」要從最後一層往前傳,每經一層就乘上一個小數,層數一多就<b>越乘越小、趨近 0</b>,前面的層幾乎學不到東西。像一句話傳話傳到最後就聽不見了。<br>
+      ② <b>過擬合</b>:模型把訓練照片<b>連雜訊都背起來</b>,考新題目(沒看過的資料)就爛掉。像學生只背考古題答案,換題就不會。</div>
     <div class="grid two">
       <div class="err"><h4>① 梯度消失 Vanishing Gradient</h4>
-        深層網路反向傳播時,梯度經過多層連乘變得<b>極小 → 接近 0</b>,前面幾層權重幾乎不更新、訓練很慢。<br>
-        <b>解法</b>:ReLU 激活、適當權重初始化(He/Xavier)、Batch Normalization、殘差(skip)連接。</div>
+        反向傳播時梯度連乘變極小 → 前層幾乎不更新。<br>
+        <b>解法</b>:ReLU、權重初始化、Batch Normalization、殘差連接 (skip/residual)。</div>
       <div class="err"><h4>② 過擬合 Overfitting</h4>
-        模型把訓練資料<b>細節甚至雜訊都背下來</b>,在沒看過的資料上表現差(訓練準、驗證爛)。<br>
-        <b>解法</b>:Dropout、資料擴增、L2 正則化、Early Stopping、更多資料。</div>
+        訓練準、驗證爛(背了雜訊,無法泛化)。<br>
+        <b>解法</b>:Dropout、資料擴增 (data augmentation)、正則化 (regularization)、Early Stopping。</div>
     </div>
-    <p class="tag">(課程投影片 "Two Training Issues of CNN" 明列的就是這兩個。)</p>
-  </div>
-
-  <h3>7 · 三個因子的兩難(Trade-off)</h3>
-  <div class="card">
-    <p><b>壓縮的三難</b>:壓縮率、影像品質、運算成本/速度,三者無法兼得。</p>
-    <div class="tri">      壓縮率(檔案小)
-            /\
-           /  \
-   影像品質 —— 運算速度/成本</div>
-    <p><b>數位浮水印的三難(經典題)</b>三個互相牽制的因子:</p>
-    <ul>
-      <li><b>強韌性 Robustness</b> — 能撐過壓縮/雜訊/裁切等攻擊。</li>
-      <li><b>不可察覺性 Imperceptibility</b> — 看不出來,不傷畫質。</li>
-      <li><b>容量 Capacity</b> — 可嵌入的資料量。</li>
-    </ul>
-    <div class="key">💡 提高容量或強韌性,通常會犧牲不可察覺性 → 三者需取平衡。</div>
-  </div>
-
-  <h3>8 · 浮水印:LSB vs DCT 兩種做法</h3>
-  <div class="card">
-    <table>
-      <tr><th></th><th>LSB(最低有效位元)</th><th>DCT(頻率域)</th></tr>
-      <tr><td>domain</td><td><b>空間域</b></td><td><b>頻率(轉換)域</b></td></tr>
-      <tr><td>做法</td><td>把像素值的<b>最低位元</b>換成浮水印 bit</td><td>做 DCT,改<b>中頻係數</b>嵌入,再做反 DCT</td></tr>
-      <tr><td>容量</td><td class="good">高</td><td>較低</td></tr>
-      <tr><td>強韌性</td><td class="bad">弱(壓縮/濾波就毀了)</td><td class="good">強(能撐過 JPEG 壓縮)</td></tr>
-      <tr><td>複雜度</td><td>簡單、快</td><td>較複雜、慢</td></tr>
-      <tr><td>用途</td><td>易碎浮水印、簡單隱寫</td><td>強韌/版權浮水印</td></tr>
+    <table class="bil">
+      <tr><th>英文</th><th>中文</th></tr>
+      <tr><td>vanishing gradient</td><td>梯度消失</td></tr>
+      <tr><td>backpropagation</td><td>反向傳播</td></tr>
+      <tr><td>overfitting / generalize</td><td>過擬合 / 泛化</td></tr>
+      <tr><td>dropout / regularization</td><td>隨機丟棄 / 正則化</td></tr>
     </table>
-    <div class="key">💡 <b>為何 DCT 嵌「中頻」?</b> 低頻一改會被看見(傷畫質);高頻會被壓縮丟掉(不強韌)→ 中頻兼顧不可察覺與強韌。</div>
+    <div class="answer"><h4>✍️ 英文作答範本</h4>
+      <span class="en">(1) <b>Vanishing gradient</b>: during <b>backpropagation</b>, gradients become very small after being multiplied through many layers, so early layers receive almost no updates and train poorly.</span>
+      <span class="zh">梯度消失:反向傳播時梯度連乘變很小,前層幾乎不更新。</span>
+      <span class="en">(2) <b>Overfitting</b>: the model fits the training data too closely (even its noise) and <b>fails to generalize</b> to unseen data.</span>
+      <span class="zh">過擬合:過度擬合訓練資料(含雜訊),無法泛化到新資料。</span></div>
+  </div>
+
+  <!-- ===== 7 ===== -->
+  <h3>7 · 三個因子的兩難(Dilemma / Trade-off of 3 Factors)</h3>
+  <div class="card">
+    <div class="plain"><h4>💡 白話秒懂</h4>
+      「<b>魚與熊掌不可兼得</b>」。就像「<b>又快、又便宜、又好,只能選兩個</b>」。數位浮水印有三個互相牽制的因子,你把其中一個拉高,另一個就會掉。</div>
+    <div class="tri">          Imperceptibility 不可察覺
+                   /\
+                  /  \
+                 /    \
+      Robustness ────── Capacity
+        強韌性            容量</div>
+    <ul>
+      <li><b>Robustness 強韌性</b> — 撐得過壓縮/雜訊/裁切等攻擊。</li>
+      <li><b>Imperceptibility 不可察覺性</b> — 看不出來,不傷畫質。</li>
+      <li><b>Capacity 容量</b> — 能藏多少資料。</li>
+    </ul>
+    <table class="bil">
+      <tr><th>英文</th><th>中文</th></tr>
+      <tr><td>trade-off / dilemma</td><td>取捨 / 兩難</td></tr>
+      <tr><td>robustness</td><td>強韌性</td></tr>
+      <tr><td>imperceptibility / fidelity</td><td>不可察覺性 / 保真度</td></tr>
+      <tr><td>capacity</td><td>容量</td></tr>
+    </table>
+    <div class="answer"><h4>✍️ 英文作答範本</h4>
+      <span class="en">In digital watermarking there is a <b>trade-off among three factors</b>: <b>robustness</b>, <b>imperceptibility</b>, and <b>capacity</b>. Improving one usually sacrifices another — e.g., embedding more data (higher capacity) or stronger robustness tends to reduce imperceptibility. A good scheme must <b>balance</b> all three.</span>
+      <span class="zh">浮水印三難:強韌性、不可察覺性、容量,提高一個會犧牲另一個,須取平衡。</span></div>
+  </div>
+
+  <!-- ===== 8 ===== -->
+  <h3>8 · 浮水印:LSB 與 DCT 兩種做法(LSB vs DCT Watermarking)</h3>
+  <div class="card">
+    <div class="plain"><h4>💡 白話秒懂</h4>
+      • <b>LSB</b>:把訊息藏在每個像素的<b>最不重要的那一位數</b>(最低位元)。像把價格的「個位數」偷改一塊錢——看不出來,<b>但很容易被洗掉</b>(一壓縮就毀)。<br>
+      • <b>DCT</b>:先轉到頻率域,把訊息藏在<b>中頻係數</b>。比較麻煩,但<b>撐得過 JPEG 壓縮</b>(強韌)。<br>
+      <b>為何藏中頻?</b> 低頻一改會被看見(傷畫質);高頻會被壓縮丟掉(不強韌)→ 中頻剛好兼顧。</div>
+    <table>
+      <tr><th></th><th>LSB</th><th>DCT</th></tr>
+      <tr><td>域 domain</td><td>空間域 spatial</td><td>頻率域 frequency/transform</td></tr>
+      <tr><td>做法</td><td>改像素最低位元 least significant bit</td><td>改中頻係數 mid-frequency coefficients</td></tr>
+      <tr><td>容量 capacity</td><td class="good">高 high</td><td>較低 lower</td></tr>
+      <tr><td>強韌性 robustness</td><td class="bad">弱 weak</td><td class="good">強 strong(抗 JPEG)</td></tr>
+      <tr><td>複雜度</td><td>簡單快 simple/fast</td><td>較複雜 complex</td></tr>
+    </table>
+    <table class="bil">
+      <tr><th>英文</th><th>中文</th></tr>
+      <tr><td>least significant bit (LSB)</td><td>最低有效位元</td></tr>
+      <tr><td>spatial domain</td><td>空間域</td></tr>
+      <tr><td>frequency / transform domain</td><td>頻率 / 轉換域</td></tr>
+      <tr><td>embed a watermark</td><td>嵌入浮水印</td></tr>
+      <tr><td>mid-frequency coefficients</td><td>中頻係數</td></tr>
+    </table>
+    <div class="answer"><h4>✍️ 英文作答範本</h4>
+      <span class="en">The <b>LSB approach</b> embeds the watermark in the <b>spatial domain</b> by replacing the <b>least significant bit</b> of each pixel. It has <b>high capacity</b> but is <b>not robust</b> — compression or filtering easily destroys it.</span>
+      <span class="zh">LSB 在空間域改像素最低位元,容量高但不強韌,壓縮就毀。</span>
+      <span class="en">The <b>DCT approach</b> embeds the watermark in the <b>frequency domain</b> by modifying <b>mid-frequency coefficients</b>. It is more <b>robust</b> and survives JPEG compression. (Mid-frequency is chosen because low frequencies are visible and high frequencies are removed by compression.)</span>
+      <span class="zh">DCT 在頻率域改中頻係數,較強韌、抗 JPEG;選中頻是因低頻會被看見、高頻會被壓縮掉。</span></div>
   </div>
 </section>
 
